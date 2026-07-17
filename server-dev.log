@@ -1,0 +1,36 @@
+
+> fmd-server@1.0.0 start:dev
+> tsx src/main/server.ts
+
+[dotenv@17.3.1] injecting env (4) from .env -- tip: 🛠️  run anywhere with `dotenvx run -- yourcommand`
+Logging Database connected successfully
+INFO:Database connected successfully
+INFO:[Scheduler] Dashboard aggregation scheduler starting...
+INFO:[DashboardWorker] Starting full aggregation run (computing all overviews)...
+INFO:[Scheduler] Next run in 1 minutes.
+INFO: Server is running
+      Port: 3000
+      
+Test log successfully written to MongoDB!
+INFO:[DashboardWorker] Aggregation run complete and all summaries saved successfully.
+INFO:[DashboardWorker] Starting full aggregation run (computing all overviews)...
+INFO:[DashboardWorker] Aggregation run complete and all summaries saved successfully.
+INFO:[DashboardWorker] Starting full aggregation run (computing all overviews)...
+INFO:[DashboardWorker] Aggregation run complete and all summaries saved successfully.
+INFO:[DashboardWorker] Starting full aggregation run (computing all overviews)...
+INFO:[DashboardWorker] Aggregation run complete and all summaries saved successfully.
+INFO:Fetching roles for email: democlient@sng.com
+[0mGET /api/auth/roles?email=democlient%40sng.com [33m404[0m 9.902 ms - 44[0m
+Log saved to DB successfully
+INFO:Fetching roles for email: democlient@gmail.com
+[0mGET /api/auth/roles?email=democlient%40gmail.com [33m404[0m 7.528 ms - 44[0m
+Log saved to DB successfully
+INFO:[DashboardWorker] Starting full aggregation run (computing all overviews)...
+INFO:[DashboardWorker] Aggregation run complete and all summaries saved successfully.
+INFO:[DashboardWorker] Starting full aggregation run (computing all overviews)...
+INFO:[DashboardWorker] Aggregation run complete and all summaries saved successfully.
+INFO:[DashboardWorker] Starting full aggregation run (computing all overviews)...
+INFO:[DashboardWorker] Aggregation run complete and all summaries saved successfully.
+INFO:Fetching roles for email: democlient@sng.com
+[0mGET /api/auth/roles?email=democlient%40sng.com [33m404[0m 8.917 ms - 44[0m
+Log saved to DB successfully

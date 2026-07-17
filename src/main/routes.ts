@@ -1,0 +1,80 @@
+import { Router } from "express"
+import authRoutes from "../presentation/routes/auth.routes.js";
+import tenantRoutes from "../presentation/routes/tenant.routes.js";
+import countryStateRoutes from "../presentation/routes/country-state.routes.js";
+import roomRoutes from "../presentation/routes/room.routes.js";
+import roomSummaryRoutes from "../presentation/routes/room-summary.routes.js";
+import campRoutes from "../presentation/routes/camp.routes.js";
+import zoneRoutes from "../presentation/routes/zone.routes.js";
+import buildingRoutes from "../presentation/routes/building.routes.js";
+import statusRoutes from "../presentation/routes/status.routes.js";
+import bedRoutes from "../presentation/routes/bed.routes.js";
+import dashboardRoutes from "../presentation/routes/dashboard.routes.js";
+import bedHistoryRoutes from "../presentation/routes/bed-history.routes.js";
+import { authenticate } from "../shared/middleware/authenticate.js";
+import coordinatorRoutes from "../presentation/routes/coordinator.routes.js";
+import attendanceRoutes from "../presentation/routes/attendance.routes.js";
+import userAssignedRoleRoutes from "../presentation/routes/user-assigned-role.routes.js";
+import roleRoutes from "../presentation/routes/role.routes.js";
+import permissionRoutes from "../presentation/routes/permission.routes.js";
+import userRoutes from "../presentation/routes/user.routes.js";
+import technicianRoutes from "../presentation/routes/technician.routes.js";
+import campAssignCoordinatorRoutes from "../presentation/routes/camp-assign-coordinator.routes.js";
+import zoneAssignCoordinatorRoutes from "../presentation/routes/zone-assign-coordinator.routes.js";
+import technicianAssignCampsRoutes from "../presentation/routes/technician-assign-camps.routes.js";
+import companyRoutes from "../presentation/routes/company.routes.js";
+import contractRoutes from "../presentation/routes/contract.routes.js";
+import contractAllocationRoutes from "../presentation/routes/contract-allocation.routes.js";
+import contractDocumentRoutes from "../presentation/routes/contract-document.routes.js";
+import customFieldRoutes from "../presentation/routes/custom-field.routes.js";
+import tenantImportRoutes from "../presentation/routes/tenant-import.routes.js";
+import guestRoutes from "../presentation/routes/guest.routes.js";
+import counterRoutes from "../presentation/routes/counter.routes.js";
+import counterPointRoutes from "../presentation/routes/counter-point.routes.js";
+import machineRoutes from "../presentation/routes/machine.routes.js";
+import machineBindingRoutes from "../presentation/routes/machine-binding.routes.js";
+import cateringRoutes from "../presentation/routes/catering.routes.js";
+import companyAccountRoutes from "../presentation/routes/company-account.routes.js";
+// import { metricsHandler } from "../infrastructure/monitoring/prometheus.js";
+
+const router = Router()
+// router.get("/metrics",authenticate,metricsHandler);
+router.use("/auth", authRoutes);
+router.use("/company-account", companyAccountRoutes);
+router.use("/user", authenticate, userRoutes);
+router.use("/tenant", authenticate, tenantRoutes);
+
+
+router.use("/rooms", authenticate, roomRoutes);
+router.use("/room-summaries", authenticate, roomSummaryRoutes);
+router.use("/camps", authenticate, campRoutes);
+router.use("/zones", authenticate, zoneRoutes);
+router.use("/buildings", authenticate, buildingRoutes);
+router.use("/statuses", authenticate, statusRoutes);
+router.use("/beds", authenticate, bedRoutes);
+router.use("/dashboard", authenticate, dashboardRoutes);
+router.use("/bed-history", authenticate, bedHistoryRoutes);
+router.use("/coordinator", authenticate, coordinatorRoutes);
+router.use("/attendance", authenticate, attendanceRoutes);
+router.use("/user-roles", authenticate, userAssignedRoleRoutes);
+router.use("/roles", authenticate, roleRoutes);
+router.use("/permissions", authenticate, permissionRoutes);
+router.use("/technician", authenticate, technicianRoutes);
+router.use("/coordinator-sites", authenticate, campAssignCoordinatorRoutes);
+router.use("/coordinator-zones", authenticate, zoneAssignCoordinatorRoutes);
+router.use("/technician-sites", authenticate, technicianAssignCampsRoutes);
+router.use("/companies", authenticate, companyRoutes);
+router.use("/country-states", authenticate, countryStateRoutes);
+router.use("/contracts", authenticate, contractRoutes);
+router.use("/contract-allocations", authenticate, contractAllocationRoutes);
+router.use("/contract-documents", authenticate, contractDocumentRoutes);
+router.use("/custom-fields", authenticate, customFieldRoutes);
+router.use("/tenant-import", authenticate, tenantImportRoutes);
+router.use("/guests", authenticate, guestRoutes);
+router.use("/counters", authenticate, counterRoutes);
+router.use("/counter-points", authenticate, counterPointRoutes);
+router.use("/machines", authenticate, machineRoutes);
+router.use("/checkin-checkout/machines", authenticate, machineBindingRoutes);
+router.use("/apm/catering", authenticate, cateringRoutes);
+
+export default router
