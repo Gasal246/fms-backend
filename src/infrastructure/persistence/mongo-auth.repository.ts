@@ -8,6 +8,7 @@ import Company from "./models/company.model.js";
 import Role, { type IRole } from "./models/role.model.js";
 import "./models/role.model.js";
 import GlobalCompanyAccount from "./models/global-company-account.model.js";
+import KitchenManager from "./models/kitchen-manager.model.js";
 
 // Models to check for user authentication. Add new models here in the future.
 // Promise.any is used below — it resolves with the FIRST collection that finds
@@ -36,9 +37,12 @@ export class MongoAuthRepository implements AuthRepository {
   async findByEmail(email: string): Promise<any> {
     try {
       return await Promise.any(
-        authModels.map((model) =>
-          findFirst(model, { email, deleted_at: null }, "client_id email password role_id status camp_id zone_id")
-        )
+        [
+          ...authModels.map((model) =>
+            findFirst(model, { email, deleted_at: null }, "client_id email password role_id status camp_id zone_id")
+          ),
+          findFirst(KitchenManager, { email: email.trim().toLowerCase(), deleted_at: null }, "+password client_id email role_id status kitchen_ids name phone"),
+        ]
       );
     } catch {
       // AggregateError — no collection had this email
@@ -49,9 +53,12 @@ export class MongoAuthRepository implements AuthRepository {
   async findById(id: string): Promise<any> {
     try {
       return await Promise.any(
-        authModels.map((model) =>
-          findFirst(model, { _id: id, deleted_at: null, }, "client_id email password role_id status camp_id zone_id")
-        )
+        [
+          ...authModels.map((model) =>
+            findFirst(model, { _id: id, deleted_at: null, }, "client_id email password role_id status camp_id zone_id")
+          ),
+          findFirst(KitchenManager, { _id: id, deleted_at: null }, "+password client_id email role_id status kitchen_ids name phone"),
+        ]
       );
     } catch {
       return null;
@@ -62,7 +69,9 @@ export class MongoAuthRepository implements AuthRepository {
     const slug = roleSlug.toLowerCase();
     let model = null;
 
-    if (slug.includes("client")) {
+    if (slug.includes("kitchen_manager")) {
+      model = KitchenManager;
+    } else if (slug.includes("client")) {
       model = Client;
     } else if (slug.includes("coordinator")) {
       model = Coordinator;
@@ -78,7 +87,11 @@ export class MongoAuthRepository implements AuthRepository {
     }
 
     try {
-      return await findFirst(model, { email, deleted_at: null}, "client_id email password role_id status camp_id zone_id");
+      const normalizedEmail = model === KitchenManager ? email.trim().toLowerCase() : email;
+      const projection = model === KitchenManager
+        ? "+password client_id email role_id status kitchen_ids name phone"
+        : "client_id email password role_id status camp_id zone_id";
+      return await findFirst(model, { email: normalizedEmail, deleted_at: null}, projection);
     } catch {
       return null;
     }
@@ -87,11 +100,12 @@ export class MongoAuthRepository implements AuthRepository {
   async getUserRoles(email: string): Promise<any[]> {
     try {
       // 1. Fetch user role_ids from all collections in parallel
-      const users = await Promise.all(
-        authModels.map((model: any) =>
+      const users = await Promise.all([
+        ...authModels.map((model: any) =>
           model.findOne({ email, deleted_at: null }).select("role_id").lean()
-        )
-      );
+        ),
+        KitchenManager.findOne({ email: email.trim().toLowerCase(), deleted_at: null }).select("role_id").lean(),
+      ]);
 
       // 2. Extract unique role ObjectIds and slugs
       const objectIds: mongoose.Types.ObjectId[] = [];

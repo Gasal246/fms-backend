@@ -5,6 +5,7 @@ import Technician from "./models/technician.model.js";
 import type { UserRepository } from "../../domain/repositories/user.repository.interface.js";
 import mongoose from "mongoose";
 import Company from "./models/company.model.js";
+import KitchenManager from "./models/kitchen-manager.model.js";
 
 export class MongoUserRepository implements UserRepository {
     private getModel(roleSlug: string): any {
@@ -17,6 +18,8 @@ export class MongoUserRepository implements UserRepository {
                 return Technician;
             case "ROLE_COMPANY":
                 return Company;
+            case "ROLE_KITCHEN_MANAGER":
+                return KitchenManager;
             default:
                 return Client;
         }
@@ -25,7 +28,7 @@ export class MongoUserRepository implements UserRepository {
     async findById(id: string, roleSlug: string): Promise<any> {
         const model = this.getModel(roleSlug);
         const user = await model.findOne(
-            { _id: new mongoose.Types.ObjectId(id) },
+            { _id: new mongoose.Types.ObjectId(id), deleted_at: null },
             { password: 0, __v: 0 }
         ).lean();
         if (!user) return null;
@@ -37,7 +40,12 @@ export class MongoUserRepository implements UserRepository {
         const model = this.getModel(roleSlug);
         const user = await model.findById(id);
         if (user) {
-            Object.assign(user, data);
+            if (roleSlug === "ROLE_KITCHEN_MANAGER") {
+                const allowed = (({ name, phone, profile_picture }) => ({ name, phone, profile_picture }))(data || {});
+                Object.assign(user, Object.fromEntries(Object.entries(allowed).filter(([, value]) => value !== undefined)));
+            } else {
+                Object.assign(user, data);
+            }
             return await user.save();
         }
         return null;

@@ -1,7 +1,7 @@
 import type { ClientSession } from "mongoose";
 import type { CateringEntity } from "../../infrastructure/persistence/models/catering.model.js";
 
-export type CateringScope = { clientId: string; companyId?: string; userId: string; role: string };
+export type CateringScope = { clientId: string; companyId?: string; userId: string; role: string; kitchenIds?: string[] };
 
 export interface CateringRepository {
   list(entity: CateringEntity, scope: CateringScope, query?: Record<string, unknown>): Promise<any[]>;

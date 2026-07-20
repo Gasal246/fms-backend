@@ -12,6 +12,11 @@ import { logger } from '../../shared/logger/logger.js';
 
 export async function seedPermissions() {
   try {
+    await Role.findOneAndUpdate(
+      { slug: 'ROLE_KITCHEN_MANAGER' },
+      { $set: { name: 'Kitchen Manager', slug: 'ROLE_KITCHEN_MANAGER', deleted_at: null } },
+      { upsert: true, new: true, setDefaultsOnInsert: true }
+    );
     const documentPermissions = [
       { name: 'View Documents', slug: 'DOCUMENT_VIEW', module: 'Compliance' },
       { name: 'Edit Documents', slug: 'DOCUMENT_EDIT', module: 'Compliance' },
@@ -25,7 +30,11 @@ export async function seedPermissions() {
       { name: 'Manage Contract Allocations', slug: 'manage_contract_allocations', module: 'Contracts' },
       { name: 'Manage Contract Documents', slug: 'manage_contract_documents', module: 'Contracts' },
       { name: 'Link / Unlink Tenants to Contracts', slug: 'link_tenant_contract', module: 'Contracts' },
-      { name: 'View Contract-linked Tenants', slug: 'view_contract_tenants', module: 'Contracts' }
+      { name: 'View Contract-linked Tenants', slug: 'view_contract_tenants', module: 'Contracts' },
+      { name: 'View Kitchen Dashboard', slug: 'view_kitchen_dashboard', module: 'Catering' },
+      { name: 'Manage Kitchen Orders', slug: 'manage_kitchen_orders', module: 'Catering' },
+      { name: 'Manage Kitchen Dispatches', slug: 'manage_kitchen_dispatches', module: 'Catering' },
+      { name: 'View Kitchen Reports', slug: 'view_kitchen_reports', module: 'Catering' }
     ];
 
     logger.info('Seeding compliance and contract permissions...');
@@ -58,6 +67,8 @@ export async function seedPermissions() {
         targetSlugs = ['DOCUMENT_VIEW', 'DOCUMENT_DOWNLOAD'];
       } else if (role.slug === 'ROLE_TENANT') {
         targetSlugs = ['DOCUMENT_VIEW', 'DOCUMENT_EDIT'];
+      } else if (role.slug === 'ROLE_KITCHEN_MANAGER') {
+        targetSlugs = ['view_kitchen_dashboard', 'manage_kitchen_orders', 'manage_kitchen_dispatches', 'view_kitchen_reports'];
       }
 
       for (const slug of targetSlugs) {

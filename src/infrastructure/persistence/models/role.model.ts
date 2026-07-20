@@ -18,6 +18,8 @@ const schema = new mongoose.Schema(
   { timestamps: true }
 );
 
+schema.index({ slug: 1 }, { unique: true, partialFilterExpression: { deleted_at: null } });
+
 schema.method("toJSON", function () {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { __v, _id, ...object } = this.toObject() as any;

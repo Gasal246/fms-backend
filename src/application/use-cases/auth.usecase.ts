@@ -24,6 +24,7 @@ export class AuthUseCase implements AuthService {
   async signIn(data: SignInRequest): Promise<any> {
     try {
       if (data.role_slug === "ROLE_COMPANY") return this.signInCompany(data as any);
+      if (data.role_slug === "ROLE_KITCHEN_MANAGER") return this.signInKitchenManager(data);
       const user = await this.authRepository.findByEmailAndRoleSlug(data.email, data.role_slug);
       if (!user) {
         throw new AppError("User not found", 404);
@@ -76,6 +77,31 @@ export class AuthUseCase implements AuthService {
       if (error instanceof AppError) throw error;
       throw new AppError(`${error.message}`, 500);
     }
+  }
+
+  private async signInKitchenManager(data: SignInRequest) {
+    const manager: any = await this.authRepository.findByEmailAndRoleSlug(data.email, "ROLE_KITCHEN_MANAGER");
+    if (!manager || !manager.password || !(await this.passwordService.compare(data.password, manager.password))) {
+      throw new AppError("Invalid email or password", 401);
+    }
+    if (manager.status !== "Active") throw new AppError("Your Kitchen Manager account has been blocked", 403);
+    if (!manager.kitchen_ids?.length) throw new AppError("No active kitchen assignment is available", 403);
+    const [role] = await this.authRepository.getRolesBySlugs(["ROLE_KITCHEN_MANAGER"]);
+    if (!role) throw new AppError("Kitchen Manager role is not configured", 500);
+    const permissions = (await this.permissionRepository.getPermissionsByRole(role._id.toString())).map(item => item.permission_slug);
+    const id = (manager._id || manager.id).toString();
+    const kitchenIds = manager.kitchen_ids.map((value: any) => value.toString());
+    const token = await this.tokenService.sign({
+      id,
+      client_id: manager.client_id.toString(),
+      email: manager.email,
+      roleId: "ROLE_KITCHEN_MANAGER",
+      kitchen_ids: kitchenIds,
+    });
+    return {
+      token,
+      user: { id, email: manager.email, name: manager.name, phone: manager.phone, role: "ROLE_KITCHEN_MANAGER", permissions, kitchenIds },
+    };
   }
 
   private async signInCompany(data: { email: string; password: string; role_slug: string; preferred_membership_id?: string }) {

@@ -12,7 +12,7 @@ const auditFields = {
 };
 
 export const CATERING_ENTITIES = [
-  "schedules", "categories", "grades", "kitchens", "kitchenManagers", "diningAreas",
+  "schedules", "categories", "grades", "kitchens", "diningAreas",
   "counters", "machines", "counterStaff", "workSites", "staffWorkSiteAssignments",
   "tenantAllocations", "companyStaffCateringAllocations", "demands", "kitchenOrders",
   "dispatches", "preorderRules", "preorderRequests", "wastage", "localServers", "servingLogs",
@@ -37,6 +37,11 @@ for (const entity of CATERING_ENTITIES) {
   if (entity === "staffWorkSiteAssignments") {
     schema.index({ client_id: 1, company_id: 1, "data.staffId": 1 }, {
       unique: true, partialFilterExpression: { "data.status": 1, deleted_at: null },
+    });
+  }
+  if (entity === "kitchenOrders") {
+    schema.index({ client_id: 1, "data.orderKey": 1 }, {
+      unique: true, partialFilterExpression: { "data.orderKey": { $type: "string" }, deleted_at: null },
     });
   }
   models.set(entity, mongoose.models[`Catering_${entity}`] || mongoose.model(`Catering_${entity}`, schema, `catering_${entity}`));
